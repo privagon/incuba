@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  redis:
+    restart: always
+    image: redis:7.2.4-alpine3.7@sha256:c1ac6782927e574394225a790b6eb476154d1a16681b1374c62625d9bc324b18
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

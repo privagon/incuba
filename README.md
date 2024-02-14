@@ -1,4 +1,4 @@
-# Incuba -  Flexible data harvester for distributed workloads.
+# Incuba - Flexible data harvester for distributed workloads.
 
 [![Tests](https://github.com/felixdorn/incuba/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/felixdorn/incuba/actions/workflows/tests.yml)
 [![Formats](https://github.com/felixdorn/incuba/actions/workflows/formats.yml/badge.svg?branch=main)](https://github.com/felixdorn/incuba/actions/workflows/formats.yml)
@@ -19,6 +19,13 @@ composer require privagon/incuba
 ## Usage
 
 // Usage goes here
+
+### Distributing load
+
+Incuba can optionally distribute load for speed accross multiple execution environments using a single-instance Redis.
+If correctness is
+also important (e.g. if you are heavily rate-limited), it is possible to integrate Incuba with Postgres or even
+ZooKeeper for better distributed locking.
 
 ## Testing
 

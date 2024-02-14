@@ -2,65 +2,49 @@
 
 namespace Felix\Incuba;
 
-use Felix\Incuba\Contracts\StoreInterface;
+use DateTime;
+use DateTimeInterface;
+use Felix\Incuba\Events\DocCrawled;
 use Felix\Incuba\Sources\Source;
+use Felix\Incuba\Utils\NullCache;
+use Felix\Incuba\Utils\NullDispatcher;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\SimpleCache\CacheInterface;
 
 class Crawler
 {
-    /** @var Source[] */
-    protected array $sources;
-
-    protected StoreInterface $store;
+    protected Source $source;
 
     protected ?array $parent = null;
 
-    private CacheInterface $defaultCache;
+    protected CacheInterface $defaultCache;
+    /** @var callable(): DateTimeInterface */
+    private $timeSource;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct()
     {
         $this->defaultCache = new NullCache();
+        $this->eventDispatcher = new NullDispatcher();
+        $this->timeSource = fn() => new DateTime();
     }
 
-    public function crawl(): self
+    public function crawl(Source $source, ?array $boundaries = null): DateTimeInterface
     {
-        foreach ($this->sources as $source) {
-            $source->withCache($this->defaultCache, force: false);
+        $boundaries ??= $source->defaultBoundaries();
 
-            $boundaries = $this->store->boundariesForUrn($source->urn()) ?? $source->defaultBoundaries();
+        $source->withCache($this->defaultCache, force: false);
 
-            foreach ($source->crawl($boundaries, $this->parent) as $offset => $doc) {
-                $this->store->storeDoc($source, $doc, $offset);
-
-                (new self)
-                    ->withStore($this->store)
-                    ->withParent($doc)
-                    ->withSources($source->children())
-                    ->crawl();
-            }
-
-            if (isset($offset)) {
-                $this->store->updateBoundaries($source->urn(), $offset);
-            }
+        foreach ($source->crawl($boundaries, $this->parent) as $offset => $doc) {
+            $this->eventDispatcher->dispatch(new DocCrawled($source, $doc, $offset));
         }
 
-        return $this;
+        return new DateTime();
     }
 
     public function withCache(CacheInterface $cache): self
     {
         $this->defaultCache = $cache;
-
-        return $this;
-    }
-
-    public function withSources(Source|array ...$sources): self
-    {
-        if (count($sources) === 1 && is_array($sources[0])) {
-            $sources = $sources[0];
-        }
-
-        $this->sources = $sources;
 
         return $this;
     }
@@ -72,9 +56,15 @@ class Crawler
         return $this;
     }
 
-    public function withStore(StoreInterface $store): self
+    public function withEventDispatcher(EventDispatcherInterface $dispatcher)
     {
-        $this->store = $store;
+        $this->eventDispatcher = $dispatcher;
+        return $this;
+    }
+
+    public function withTimeSource(callable $timeSource): self
+    {
+        $this->timeSource = $timeSource;
 
         return $this;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Felix\Incuba;
+namespace Felix\Incuba\Utils;
 
 use DateInterval;
 use Psr\SimpleCache\CacheInterface;

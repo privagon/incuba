@@ -1,6 +1,6 @@
 {
     "name": "privagon/incuba",
-    "description": "incuba",
+    "description": " Flexible data harvester for distributed workloads with trail of operations.",
     "license": "MIT",
     "authors": [
         {
@@ -10,6 +10,7 @@
     ],
     "require": {
         "php": "^8.3",
+        "psr/event-dispatcher": "^1.0",
         "psr/simple-cache": "^3.0.0"
     },
     "require-dev": {
