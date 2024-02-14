@@ -1,4 +1,4 @@
-fjk incuba
+# Incuba -  Flexible data harvester for distributed workloads.
 
 [![Tests](https://github.com/felixdorn/incuba/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/felixdorn/incuba/actions/workflows/tests.yml)
 [![Formats](https://github.com/felixdorn/incuba/actions/workflows/formats.yml/badge.svg?branch=main)](https://github.com/felixdorn/incuba/actions/workflows/formats.yml)
@@ -8,20 +8,23 @@ fjk incuba
 
 ## Installation
 
-> Requires [PHP 8.2+](https://php.net/releases)
+> Requires [PHP 8.3+](https://php.net/releases)
 
 You can install the package via composer:
 
 ```bash
-composer require felixdorn/incuba
+composer require privagon/incuba
 ```
 
 ## Usage
+
 // Usage goes here
 
 ## Testing
+
 ```bash
 composer test
 ```
 
-**incuba** was created by **[Félix Dorn](https://felixdorn.fr)** under the **[MIT license](https://opensource.org/licenses/MIT)**.
+**Incuba** was created by **[Félix Dorn](https://felixdorn.fr)** under the *
+*[MIT license](https://opensource.org/licenses/MIT)**.

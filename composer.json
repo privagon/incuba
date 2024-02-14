@@ -1,5 +1,5 @@
 {
-    "name": "felixdorn/incuba",
+    "name": "privagon/incuba",
     "description": "incuba",
     "license": "MIT",
     "authors": [
@@ -10,15 +10,13 @@
     ],
     "require": {
         "php": "^8.3",
-        "guzzlehttp/guzzle": "^7.8",
-        "psr/simple-cache": "^3.0"
+        "psr/simple-cache": "^3.0.0"
     },
     "require-dev": {
-        "gmostafa/php-graphql-client": "^1.13",
-        "laravel/pint": "^1.10",
-        "pestphp/pest": "^2.6",
-        "phpstan/phpstan": "^1.10",
-        "symfony/var-dumper": "^6"
+        "laravel/pint": "^1.13",
+        "pestphp/pest": "^2.33",
+        "phpstan/phpstan": "^1.11",
+        "symfony/var-dumper": "^7"
     },
     "autoload": {
         "psr-4": {
