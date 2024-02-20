@@ -2,9 +2,10 @@
 
 namespace Felix\Incuba;
 
-use DateTime;
-use DateTimeInterface;
-use Felix\Incuba\Events\DocCrawled;
+use Felix\Incuba\Events\DocumentCrawledEvent;
+use Felix\Incuba\Events\DocumentProcessedEvent;
+use Felix\Incuba\Pipeline\DisjoinedPipeline;
+use Felix\Incuba\Pipeline\Pipeline;
 use Felix\Incuba\Sources\Source;
 use Felix\Incuba\Utils\NullCache;
 use Felix\Incuba\Utils\NullDispatcher;
@@ -18,28 +19,33 @@ class Crawler
     protected ?array $parent = null;
 
     protected CacheInterface $defaultCache;
-    /** @var callable(): DateTimeInterface */
-    private $timeSource;
     private EventDispatcherInterface $eventDispatcher;
+    /** @var Pipeline[] */
+    private array $pipelines = [];
 
     public function __construct()
     {
         $this->defaultCache = new NullCache();
         $this->eventDispatcher = new NullDispatcher();
-        $this->timeSource = fn() => new DateTime();
     }
 
-    public function crawl(Source $source, ?array $boundaries = null): DateTimeInterface
+    public function crawl(Source $source, ?array $boundaries = null)
     {
         $boundaries ??= $source->defaultBoundaries();
 
         $source->withCache($this->defaultCache, force: false);
 
         foreach ($source->crawl($boundaries, $this->parent) as $offset => $doc) {
-            $this->eventDispatcher->dispatch(new DocCrawled($source, $doc, $offset));
-        }
+            $document = new Document($source, $doc, $offset);
 
-        return new DateTime();
+            $this->eventDispatcher->dispatch(new DocumentCrawledEvent($document));
+
+            foreach ($this->pipelines as $pipeline) {
+                $processed = $pipeline->run($document);
+
+                $this->eventDispatcher->dispatch(new DocumentProcessedEvent($pipeline, $processed));
+            }
+        }
     }
 
     public function withCache(CacheInterface $cache): self
@@ -56,15 +62,16 @@ class Crawler
         return $this;
     }
 
-    public function withEventDispatcher(EventDispatcherInterface $dispatcher)
+    public function withEventDispatcher(EventDispatcherInterface $dispatcher): self
     {
         $this->eventDispatcher = $dispatcher;
+
         return $this;
     }
 
-    public function withTimeSource(callable $timeSource): self
+    public function withPipelines(Pipeline|DisjoinedPipeline ...$pipelines): self
     {
-        $this->timeSource = $timeSource;
+        $this->pipelines = $pipelines;
 
         return $this;
     }

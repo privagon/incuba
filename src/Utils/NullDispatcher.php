@@ -6,9 +6,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class NullDispatcher implements EventDispatcherInterface
 {
-
-    public function dispatch(object $event)
+    public function dispatch(object $event): object
     {
-        // no-op
+        return $event;
     }
 }

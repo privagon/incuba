@@ -9,9 +9,13 @@ use Psr\SimpleCache\CacheInterface;
 abstract class Source
 {
     public const int SECOND = 1;
+
     public const int MINUTE = self::SECOND * 60;
+
     public const int HOUR = self::MINUTE * 60;
+
     public const int DAY = self::HOUR * 24;
+
     public const int WEEK = self::DAY * 7;
 
     private static ?CacheInterface $cache = null;
@@ -32,7 +36,7 @@ abstract class Source
 
     public static function withCache(CacheInterface $cache, bool $force = false): void
     {
-        if (!$force && self::$cache) {
+        if (! $force && self::$cache) {
             return;
         }
 
@@ -43,15 +47,13 @@ abstract class Source
     {
         $urn = [];
 
-
         $source = static::class;
 
         while ($source !== null) {
             $urn[] = $source::$id;
 
-            $source =  ($source::$parent);
+            $source = ($source::$parent);
         }
-
 
         $urn[] = 'source';
         $urn[] = self::$projectName;
